@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { db } from "../router/index.js";
 export default {
   data() {
     return {};
@@ -45,6 +46,11 @@ export default {
     setting() {
       this.$router.push("setting");
     }
+  },
+  mounted() {
+    db.collection("test").add({
+      test: "123"
+    });
   }
 };
 </script>
