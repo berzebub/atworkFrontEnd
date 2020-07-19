@@ -25,6 +25,11 @@ const routes = [
     name: "refersentence"
   },
   {
+    path: "/refersentencedetail/:id",
+    component: () => import("pages/refersentencedetail.vue"),
+    name: "refersentencedetail"
+  },
+  {
     path: "/referconversation",
     component: () => import("pages/referconversation.vue"),
     name: "referconversation"

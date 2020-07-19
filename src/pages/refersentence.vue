@@ -1,17 +1,20 @@
 <template>
-  <div style="width:90%; margin:auto;">
-    <q-select
-      outlined
-      v-model="positionSelected"
-      :options="positionList"
-      class="q-pt-md"
-      filled
-      map-options
-      emit-value
-      @input="filterUnit()"
-    />
-
-    <div v-for="(item,index) in unitSelected" :key="index">
+  <div>
+    <div style="width:90%; margin:auto;" class="q-pb-md">
+      <q-select
+        outlined
+        v-model="positionSelected"
+        :options="positionList"
+        class="q-pt-md"
+        color="indigo-12"
+        dense
+        map-options
+        emit-value
+        @input="filterUnit()"
+      />
+    </div>
+    <q-separator />
+    <div v-for="(item,index) in unitSelected" :key="index" @click="goToDetail(item.id)">
       <q-item clickable v-ripple>
         <q-item-section>{{item.name}}</q-item-section>
         <q-item-section side>
@@ -59,6 +62,7 @@ export default {
     };
   },
   methods: {
+    //*** Menu */
     practiceBtn() {
       this.$router.push("practicemain");
     },
@@ -71,6 +75,8 @@ export default {
     setting() {
       this.$router.push("setting");
     },
+
+    //*** Mount */
     loadPosition() {
       this.positionList = [];
       db.collection("level")
@@ -87,30 +93,51 @@ export default {
           this.positionList.sort((a, b) => {
             return a.name > b.name ? -1 : 1;
           });
-          this.positionSelected = this.positionList[0].value;
+          this.positionSelected = this.$q.localStorage.getItem("lId");
         });
     },
     loadUnitAll() {
       db.collection("unit")
-        .orderBy("order")
+        .where("status", "==", true)
         .get()
         .then(doc => {
           doc.forEach(data => {
-            this.unitList.push(data.data());
+            let temp = {
+              id: data.id
+            };
+            let final = { ...temp, ...data.data() };
+            this.unitList.push(final);
           });
+          this.unitList.sort((a, b) => a.order - b.order);
           this.filterUnit();
         });
     },
+    //ตรวจสอบการ login
+    checkLogin() {
+      let _this = this;
+      auth.onAuthStateChanged(function(user) {
+        if (!user) {
+          _this.$router.push("/");
+          // No user is signed in.
+        }
+      });
+    },
+
+    //***Internal Function */
     filterUnit() {
       this.unitSelected = this.unitList.filter(
         x => x.levelId == this.positionSelected
       );
+    },
+    goToDetail(unitId) {
+      this.$router.push("/refersentencedetail/" + unitId);
     }
   },
 
-  async mounted() {
-    await this.loadPosition();
-    await this.loadUnitAll();
+  mounted() {
+    this.checkLogin();
+    this.loadPosition();
+    this.loadUnitAll();
   }
 };
 </script>

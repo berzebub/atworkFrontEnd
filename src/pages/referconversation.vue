@@ -47,11 +47,7 @@ export default {
       this.$router.push("setting");
     }
   },
-  mounted() {
-    db.collection("test").add({
-      test: "123"
-    });
-  }
+  mounted() {}
 };
 </script>
 
