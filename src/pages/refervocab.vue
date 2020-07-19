@@ -11,6 +11,7 @@
         dense
         map-options
         emit-value
+        @input="vocabFilter()"
       />
       <!-- ค้นหา -->
       <q-input
@@ -25,6 +26,8 @@
         v-model="searchText"
         bg-color="indigo-1"
         input-class="text-black"
+        @keyup="vocabSearch()"
+        @clear="vocabFilter()"
       >
         <template v-slot:prepend>
           <q-icon name="fas fa-search" color="indigo-12" />
@@ -35,19 +38,31 @@
     <!-- Vocab list -->
     <div style="height:calc(100vh - 180px); overflow: scroll">
       <div v-for="(item,index) in vocabSelectedList" :key="index">
-        <div class="row items-center">
-          <div class="q-px-md q-pt-md" style="width:75px">
-            <img src="../assets/logo.png" alt style="width:50px;" />
+        <div class="row items-center" style="height:75px;">
+          <div style="width:90px">
+            <img
+              src="../assets/nopic.png"
+              alt
+              style="position:relative; padding:0px; width:75px;"
+              v-if="!item.isImage"
+            />
+            <img
+              :src="'https://storage.cloud.google.com/atwork-dee11.appspot.com/practice/image/' + item.id + '.jpg'"
+              alt
+              style="width:60px;"
+              v-if="item.isImage"
+              class="q-ml-sm q-pt-sm"
+            />
           </div>
-          <div class="q-py-md col">
+          <div class="col">
             <div>{{item.vocabulary}}</div>
-            <div>{{item.meaning}}</div>
+            <div class="text-subtitle2">{{item.meaning}}</div>
           </div>
           <div style="width:40px" align="center">
             <q-icon name="fas fa-volume-up" color="orange"></q-icon>
           </div>
         </div>
-        <div style="height:5px" class="bg-grey-2"></div>
+        <div style="height:3px" class="bg-grey-2"></div>
       </div>
     </div>
 
@@ -127,7 +142,14 @@ export default {
         .get()
         .then(doc => {
           doc.forEach(data => {
-            this.vocabAllList.push(data.data());
+            let temp = {
+              id: data.id,
+              searchText: data.data().vocabulary + " " + data.data().meaning
+            };
+
+            let final = { ...temp, ...data.data() };
+
+            this.vocabAllList.push(final);
           });
           this.vocabAllList.sort((a, b) => {
             if (a.vocabulary > b.vocabulary) {
@@ -141,6 +163,24 @@ export default {
             x => x.levelId == this.positionSelected
           );
         });
+    },
+    vocabFilter() {
+      this.vocabSelectedList = [];
+      this.vocabSelectedList = this.vocabAllList.filter(
+        x => x.levelId == this.positionSelected
+      );
+    },
+    vocabSearch() {
+      if (this.searchText == "") {
+        this.vocabFilter();
+      } else {
+        this.vocabSelectedList = [];
+        this.vocabSelectedList = this.vocabAllList.filter(
+          x =>
+            x.levelId == this.positionSelected &&
+            x.searchText.indexOf(this.searchText) != -1
+        );
+      }
     }
   },
   mounted() {
