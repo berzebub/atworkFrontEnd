@@ -20,12 +20,13 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 export const db = firebase.firestore();
-if (location.hostname === "localhost") {
-  db.settings({ host: "localhost:4000", ssl: false });
-}
+// if (location.hostname === "localhost") {
+//   db.settings({ host: "localhost:4000", ssl: false });
+// }
 
 const storage = firebase.storage();
 export const st = storage.ref();
+export const auth = firebase.auth();
 
 /*
  * If not building with SSR mode, you can
@@ -36,7 +37,7 @@ export const st = storage.ref();
  * with the Router instance.
  */
 
-export default function(/* { store, ssrContext } */) {
+export default function (/* { store, ssrContext } */) {
   const Router = new VueRouter({
     scrollBehavior: () => ({ x: 0, y: 0 }),
     routes,
