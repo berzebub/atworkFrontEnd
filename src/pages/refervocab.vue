@@ -1,37 +1,58 @@
 <template>
-  <div style="width:90%; margin:auto;">
-    <!-- ตำแหน่ง -->
-    <q-select
-      outlined
-      v-model="positionSelected"
-      :options="positionList"
-      class="q-pt-md"
-      color="indigo-12"
-      dense
-      map-options
-      emit-value
-    />
-    <!-- ค้นหา -->
-    <q-input
-      rounded
-      standout
-      dark
-      class="q-pt-md"
-      dense
-      clearable
-      clear-icon="close"
-      placeholder="ค้นหา"
-      v-model="searchText"
-      bg-color="indigo-1"
-      input-class="text-black"
-    >
-      <template v-slot:prepend>
-        <q-icon name="fas fa-search" color="indigo-12" />
-      </template>
-    </q-input>
+  <div>
+    <div style="width:90%; margin:auto;">
+      <!-- ตำแหน่ง -->
+      <q-select
+        outlined
+        v-model="positionSelected"
+        :options="positionList"
+        class="q-pt-md"
+        color="indigo-12"
+        dense
+        map-options
+        emit-value
+      />
+      <!-- ค้นหา -->
+      <q-input
+        rounded
+        standout
+        dark
+        class="q-pt-md"
+        dense
+        clearable
+        clear-icon="close"
+        placeholder="ค้นหา"
+        v-model="searchText"
+        bg-color="indigo-1"
+        input-class="text-black"
+      >
+        <template v-slot:prepend>
+          <q-icon name="fas fa-search" color="indigo-12" />
+        </template>
+      </q-input>
+    </div>
+
+    <!-- Vocab list -->
+    <div style="height:calc(100vh - 180px); overflow: scroll">
+      <div v-for="(item,index) in vocabSelectedList" :key="index">
+        <div class="row items-center">
+          <div class="q-px-md q-pt-md" style="width:75px">
+            <img src="../assets/logo.png" alt style="width:50px;" />
+          </div>
+          <div class="q-py-md col">
+            <div>{{item.vocabulary}}</div>
+            <div>{{item.meaning}}</div>
+          </div>
+          <div style="width:40px" align="center">
+            <q-icon name="fas fa-volume-up" color="orange"></q-icon>
+          </div>
+        </div>
+        <div style="height:5px" class="bg-grey-2"></div>
+      </div>
+    </div>
 
     <!-- Footer -->
-    <div class="row absolute-bottom q-py-sm shadow-20 text-grey-6">
+    <div class="row fixed-bottom q-py-sm shadow-20 text-grey-6">
       <div style="width:20%" align="center" class="grey-6" @click="practiceBtn()">
         <q-icon name="fas fa-home" size="20px" />
         <br />แบบฝึกหัด
@@ -63,6 +84,8 @@ export default {
     return {
       positionList: [],
       positionSelected: "",
+      vocabAllList: [],
+      vocabSelectedList: [],
       searchText: ""
     };
   },
@@ -99,11 +122,30 @@ export default {
         });
     },
     loadVocabAll() {
-      // db.collection("practice_server")
+      db.collection("practice_server")
+        .where("type", "==", "flashcard")
+        .get()
+        .then(doc => {
+          doc.forEach(data => {
+            this.vocabAllList.push(data.data());
+          });
+          this.vocabAllList.sort((a, b) => {
+            if (a.vocabulary > b.vocabulary) {
+              return 1;
+            } else {
+              return -1;
+            }
+          });
+          this.vocabSelectedList = [];
+          this.vocabSelectedList = this.vocabAllList.filter(
+            x => x.levelId == this.positionSelected
+          );
+        });
     }
   },
   mounted() {
     this.loadPosition();
+    this.loadVocabAll();
   }
 };
 </script>
