@@ -30,6 +30,11 @@ const routes = [
     name: "refersentencedetail"
   },
   {
+    path: "/referconversationdetail/:id",
+    component: () => import("pages/referconversationdetail.vue"),
+    name: "referconversationdetail"
+  },
+  {
     path: "/referconversation",
     component: () => import("pages/referconversation.vue"),
     name: "referconversation"
