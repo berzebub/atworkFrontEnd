@@ -37,7 +37,7 @@
 
     <!-- Vocab list -->
     <div style="height:calc(100vh - 180px); overflow: scroll">
-      <div v-for="(item,index) in vocabSelectedList" :key="index">
+      <div v-for="(item,index) in vocabSelectedList" :key="index" @click="playSound(item.id)">
         <div class="row items-center" style="height:75px;">
           <div style="width:90px">
             <img
@@ -105,6 +105,7 @@ export default {
     };
   },
   methods: {
+    //*** menu
     practiceBtn() {
       this.$router.push("practicemain");
     },
@@ -117,6 +118,9 @@ export default {
     setting() {
       this.$router.push("setting");
     },
+
+    //***  mount
+    // โหลดตำแหน่งทั้งหมดมาเก็บไว้ใน positionList
     loadPosition() {
       this.positionList = [];
       db.collection("level")
@@ -136,6 +140,7 @@ export default {
           this.positionSelected = this.$q.localStorage.getItem("lId");
         });
     },
+    //โหลดคำศัพท์ทั้งหมดมาเก็บใน vocabAllList
     loadVocabAll() {
       db.collection("practice_server")
         .where("type", "==", "flashcard")
@@ -164,12 +169,26 @@ export default {
           );
         });
     },
+    //ตรวจสอบการ login
+    checkLogin() {
+      let _this = this;
+      auth.onAuthStateChanged(function(user) {
+        if (!user) {
+          _this.$router.push("/");
+          // No user is signed in.
+        }
+      });
+    },
+
+    //*** internal function
+    //ทำการเลือกคำศัพท์ตามตำแหน่ง
     vocabFilter() {
       this.vocabSelectedList = [];
       this.vocabSelectedList = this.vocabAllList.filter(
         x => x.levelId == this.positionSelected
       );
     },
+    //ทำการ filter คำศัพท์ตามคำค้นหา
     vocabSearch() {
       if (this.searchText == "") {
         this.vocabFilter();
@@ -181,9 +200,14 @@ export default {
             x.searchText.indexOf(this.searchText) != -1
         );
       }
+    },
+    //เล่นเสียงคำศัพท์
+    playSound(vocabId) {
+      console.log(vocabId);
     }
   },
   mounted() {
+    this.checkLogin();
     this.loadPosition();
     this.loadVocabAll();
   }
