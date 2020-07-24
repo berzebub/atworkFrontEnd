@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="width:90%; margin:auto;">
+    <div style="width:100%; margin:auto;" class="fixed-top bg-white z-top q-px-md q-pb-sm">
       <!-- ตำแหน่ง -->
       <q-select
         outlined
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Vocab list -->
-    <div style="height:calc(100vh - 180px); overflow: scroll">
+    <div style="margin-top:120px;margin-bottom:60px">
       <div v-for="(item,index) in vocabSelectedList" :key="index" @click="playSound(item.id)">
         <div class="row items-center" style="height:75px;">
           <div style="width:90px">
@@ -67,7 +67,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="row fixed-bottom q-py-sm shadow-20 text-grey-6">
+    <div class="row fixed-bottom bg-white q-py-sm shadow-20 text-grey-6">
       <div style="width:20%" align="center" class="grey-6" @click="practiceBtn()">
         <q-icon name="fas fa-home" size="20px" />
         <br />แบบฝึกหัด
@@ -101,7 +101,7 @@ export default {
       positionSelected: "",
       vocabAllList: [],
       vocabSelectedList: [],
-      searchText: ""
+      searchText: "",
     };
   },
   methods: {
@@ -126,11 +126,11 @@ export default {
       db.collection("level")
         .where("status", "==", true)
         .get()
-        .then(doc => {
-          doc.forEach(data => {
+        .then((doc) => {
+          doc.forEach((data) => {
             let temp = {
               value: data.id,
-              label: data.data().name
+              label: data.data().name,
             };
             this.positionList.push(temp);
           });
@@ -145,11 +145,11 @@ export default {
       db.collection("practice_server")
         .where("type", "==", "flashcard")
         .get()
-        .then(doc => {
-          doc.forEach(data => {
+        .then((doc) => {
+          doc.forEach((data) => {
             let temp = {
               id: data.id,
-              searchText: data.data().vocabulary + " " + data.data().meaning
+              searchText: data.data().vocabulary + " " + data.data().meaning,
             };
 
             let final = { ...temp, ...data.data() };
@@ -165,14 +165,14 @@ export default {
           });
           this.vocabSelectedList = [];
           this.vocabSelectedList = this.vocabAllList.filter(
-            x => x.levelId == this.positionSelected
+            (x) => x.levelId == this.positionSelected
           );
         });
     },
     //ตรวจสอบการ login
     checkLogin() {
       let _this = this;
-      auth.onAuthStateChanged(function(user) {
+      auth.onAuthStateChanged(function (user) {
         if (!user) {
           _this.$router.push("/");
           // No user is signed in.
@@ -185,7 +185,7 @@ export default {
     vocabFilter() {
       this.vocabSelectedList = [];
       this.vocabSelectedList = this.vocabAllList.filter(
-        x => x.levelId == this.positionSelected
+        (x) => x.levelId == this.positionSelected
       );
     },
     //ทำการ filter คำศัพท์ตามคำค้นหา
@@ -195,7 +195,7 @@ export default {
       } else {
         this.vocabSelectedList = [];
         this.vocabSelectedList = this.vocabAllList.filter(
-          x =>
+          (x) =>
             x.levelId == this.positionSelected &&
             x.searchText.indexOf(this.searchText) != -1
         );
@@ -204,13 +204,13 @@ export default {
     //เล่นเสียงคำศัพท์
     playSound(vocabId) {
       console.log(vocabId);
-    }
+    },
   },
   mounted() {
     this.checkLogin();
     this.loadPosition();
     this.loadVocabAll();
-  }
+  },
 };
 </script>
 

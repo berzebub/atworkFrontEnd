@@ -53,9 +53,9 @@ export default {
     return {
       loginInput: {
         email: "pakkawat.kh@gmail.com",
-        password: "chomart12"
+        password: "chomart12",
       },
-      isPwd: true
+      isPwd: true,
     };
   },
   methods: {
@@ -66,7 +66,7 @@ export default {
             this.loginInput.email,
             this.loginInput.password
           )
-          .then(async result => {
+          .then(async (result) => {
             let docUser = await db
               .collection("employee")
               .where("email", "==", this.loginInput.email)
@@ -85,15 +85,15 @@ export default {
               console.log("No database Info");
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.log("fail");
           });
       });
     },
     forgetPassword() {
       this.$router.push("forgetpassword");
-    }
-  }
+    },
+  },
 };
 </script>
 
